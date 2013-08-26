@@ -1,0 +1,73 @@
+.view-card {
+	background-color: $base-color;
+
+	.version {
+		font-size: 50%;
+		color: darken($base-color, 20%);
+	}
+
+	.x-body.x-scroll-view {
+		margin: .1em .5em .5em .5em;
+		background-color: lighten($base-color, 30%);
+        @include border-radius(.3em);
+        border: 1px solid darken($base-color, 10%);
+
+	    .mug {
+	    	width: 6em;
+			float: right;
+			margin-right: -.2em;
+	    }
+
+	    .display-name {
+		    font-family: Klavika-Regular;
+		    text-transform: uppercase;
+		    font-size: 1.8em;
+	    }
+
+	    .title {
+	    	font-family: Helvetica;
+	    	font-size: 1.4em;
+	    	color: darken($base-color, 45%);
+	    }
+
+	    .notes {
+	    	margin-bottom: 1em !important;
+	    }
+		
+		.contact-types {
+			.x-dataview-item a {
+				display: block;
+				margin: 1em;
+				padding: 1em;
+				background-color: lighten($accent-color, 39%);
+				@include border-radius(.3em);
+				border: 1px solid lighten($accent-color, 25%);
+				text-decoration: none;
+				font-size: .7em;
+				
+				.type {
+					width: 2em;
+					text-align: right;
+					color: $accent-color;
+					text-transform: lowercase;
+					display: inline-block;
+					width: 6em;
+				}
+
+				.type-data {
+					margin-left: 1em;
+					color: darken($base-color, 45%);
+				}
+			}
+		}
+
+		.x-mask {
+			background: none;
+
+			.x-mask-inner {
+				background: none;
+				color: darken($base-color, 20%);
+			}
+		}
+	}
+}

@@ -1,0 +1,12 @@
+.x-toolbar {
+	background-color: $base-color !important;
+	background-image: none !important;
+	border: none !important;
+
+	.x-title .x-innerhtml {
+	    font-family: Klavika-Regular;
+	    text-transform: uppercase;
+	    color: $accent-color;
+	    font-weight: 500;
+	}
+}

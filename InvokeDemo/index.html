@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta id="extViewportMeta" name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <title>Chat tester</title>
+    <style type="text/css">
+        button {
+            font-size: 100%;
+        }
+
+        #log {
+            padding: 20px;
+        }
+
+        #invokeResults {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+    <script src="http://space.sencha.io/space.js"></script>
+
+ 
+</head>
+<body>
+<h1>Invoke Demo</h1>
+
+<button id="getPhoto">Get Photos</button>
+
+<button id="createTodo">New Todo</button>
+
+
+
+<div id="invokeResults">--</div>
+<div id="log"></div>
+<script type="text/javascript">
+    window.onerror = function(a, b, c) {
+        alert(a + ' ' + b + ' ' + c);
+    };
+</script>
+
+
+<script type="text/javascript">
+function log(message) {
+    var div = document.createElement('div');
+
+    div.textContent = message;
+    console.log(message);
+
+    document.getElementById('log').appendChild(div);
+}
+
+
+function sendMessage(invokeName, data, background){
+
+    console.log("send message");
+    var success = function(message) {
+        console.log("message",message);
+        log('Received success: ' + JSON.stringify(message, null, 2));
+    };
+
+    var failure = function(error) {
+        log('Received error: ' + JSON.stringify(error, null, 2));
+    }
+
+    var send = function(connection) {
+        connection.send(data, background).then(
+            success,
+            failure
+        );
+    };
+
+    Ext.space.Invoke.get(invokeName).then(send, failure);
+
+}
+
+
+function wireButton(btnId, invokeName, data, forground, callback){
+
+    var button = document.getElementById(btnId);
+    
+    button.addEventListener('click', function() {
+        log("click");
+        sendMessage(invokeName, data, forground);
+    }, true);
+
+}
+
+
+Ext.onSpaceReady(function(){
+   
+
+    console.log("Space Ready fired!");
+    
+
+    wireButton('getPhoto',  'photos', {}, true);
+
+    wireButton('createTodo',  'todo', {action: 'create', todo: 'From Invoke Tests'}, false);
+    
+});
+</script>
+</body>
+</html>

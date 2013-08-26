@@ -1,0 +1,57 @@
+// Some default overrides
+$base-color: #eae8e7; // grayish
+$accent-color: #eb652f; // reddish-orangish
+
+// Do not include default icons
+$include-pictos-font: false;
+$include-default-icons: false;
+
+// Reduce .css size by disabling experimental flags we're not using
+$experimental-support-for-mozilla : false;
+$experimental-support-for-webkit : false;
+// $support-for-original-webkit-gradients : false; // keeping this, otherwise select field text fade doesn't work
+$experimental-support-for-opera : false;
+$experimental-support-for-microsoft : false;
+$experimental-support-for-khtml : false;
+
+// Required parts of Touch framework
+@import 'sencha-touch/_default.scss';
+@import 'sencha-touch/default/src/_Class.scss';
+
+// Only import parts of Touch framework we're using
+@import 'sencha-touch/default/src/_Button.scss';
+@import 'sencha-touch/default/src/_Panel.scss';
+@import 'sencha-touch/default/src/_Sheet.scss';
+@import 'sencha-touch/default/src/_MessageBox.scss';
+@import 'sencha-touch/default/src/_Toolbar.scss';
+@import 'sencha-touch/default/src/form/_Panel.scss';
+@import 'sencha-touch/default/src/field/_Field.scss';
+@import 'sencha-touch/default/src/dataview/_List.scss';
+
+// Custom .scss
+@import '_toolbar.scss';
+@import '_searchfield.scss'; 
+@import '_list.scss';
+@import '_button.scss';
+@import '_viewcard.scss';
+
+// Custom icon font
+@include icon-font('IcoMoon', inline-font-files(
+  'icomoon/icomoon.woff', woff, 
+  'icomoon/icomoon.ttf', truetype,
+  'icomoon/icomoon.svg', svg
+));
+@include icon("add", "a", 'IcoMoon');
+@include icon("trash", "t", 'IcoMoon');
+@include icon("search", "s", 'IcoMoon');
+@include icon("check2", "3", 'IcoMoon');
+
+// Custom Klavika font
+@font-face {
+	font-family: Klavika-Regular;
+	src:url('../sass/stylesheets/fonts/klavika/Klavika-Regular.eot');
+	src:url('../sass/stylesheets/fonts/klavika/Klavika-Regular.woff') format('woff'),
+		url('../sass/stylesheets/fonts/klavika/Klavika-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}

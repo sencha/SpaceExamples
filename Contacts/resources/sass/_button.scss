@@ -1,0 +1,30 @@
+.x-button {
+	background-color: $accent-color !important;
+	background-image: none !important;
+	border: 1px solid darken($accent-color, 20%) !important;
+	border-radius: 0.2em !important;
+
+	&.dark {
+		background-color: darken($base-color, 25%) !important;
+		border: 1px solid darken($base-color, 35%) !important;
+	}
+
+	.x-button-icon {
+		&:before {
+			color: lighten($base-color, 20%);
+			font-size: 1.1em !important;
+		}
+	}
+	.x-button-label {
+		color: lighten($base-color, 35%);
+		font-family: Arial;
+		// Need some funky CSS to achieve the inset shadow effect
+		// on text-shadow
+		//@include text-shadow(darken($base-color, 45%) 1px 1px 0);
+	}
+}
+
+// For some reason the add button icon is too high
+.phone .x-button .x-button-icon.add:before {
+	top: .1em !important;
+}
