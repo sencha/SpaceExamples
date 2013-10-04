@@ -93,17 +93,14 @@ jQuery(function ($) {
 			var self = this;
 			//this.todos = Utils.store('todos-jquery');
 
-			Invoke.init();
-
-
-
-
-
 			Utils.store('todos-jquery').then(function(data){
 				self.todos = data || [];
 				self.cacheElements();
 				self.bindEvents();
 				self.render();
+
+				//Don't respond to invoke messages until after the data is setup.
+				Invoke.init();
 
 			});
 
