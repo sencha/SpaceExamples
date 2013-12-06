@@ -49,13 +49,15 @@
 
 @mixin st-box($important: no) {
     @if $important == important {
-        display: -webkit-box !important;
-        display: -ms-flexbox !important;
-        display: flex !important;
+      display: flex !important;
+      display: -webkit-box !important;
+      display: -ms-flexbox !important;
+
     } @else {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
+      display: flex;
+      display: -webkit-box;
+      display: -ms-flexbox;
+
     }
 }
 

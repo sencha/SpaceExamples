@@ -5,19 +5,21 @@
  */
 
 Ext.define('Contacts.store.ContactTypes', {
-    extend: 'Ext.data.Store',
+        extend: 'Ext.data.Store',
 
-    requires: [
-        'Contacts.model.ContactType',
-        'Contacts.data.proxy.SecureSql'
-    ],
+        requires: [
+            'Contacts.model.ContactType',
+            'Contacts.data.proxy.Sql',
+            'Contacts.data.proxy.SecureSql'
+        ],
 
-    config: {
-        model: 'Contacts.model.ContactType',
-        storeId: 'ContactTypes',
-        proxy: {
-            type: 'securesql',
-            table: 'ContactTypes'
+        config: {
+            model: 'Contacts.model.ContactType',
+            storeId: 'ContactTypes',
+            proxy:({
+                type: Ext.isSpace ? 'securesql' : 'sql',
+                table: 'ContactTypes'
+            })
         }
     }
-});
+);
