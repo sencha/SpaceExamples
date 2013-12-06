@@ -24,7 +24,7 @@
 		{ 
 			"id"          : "1002",
 			"displayName" : "Paramedics",
-			"title"       : "Health Emeregencies",
+			"title"       : "Health Emergencies",
 			"img"         : "images/Icon_Ambulance.png",
 			"firstName"   : "",
 			"lastName"    : "",
