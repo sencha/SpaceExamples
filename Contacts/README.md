@@ -1,18 +1,19 @@
-Emergency Contacts
-=================
+###Emergency Contacts
 
-TESTING
+
+####TESTING
 
 Access index.html over a web server.
 
-BUILDING
+####BUILDING
 
 Due to issues with Touch 2.2 production microloader in regards to utilizing local storage,
 we're building this as "package", which doesn't utilize local storage. Hence, the build process is as follows:
-# cd into this directory (where this README.md is)
-# wipe build/Contacts/ (it doesn't get cleaned between builds)
-# edit cache.appcache and update the timestamp (otherwise you won't be able to refresh your app)
-# edit index.html and update version string (search for Contacts.versionString)
-# execute "sencha app build package" (alternatively you could build testing)
-# navigate to build/Contacts/package (or testing)
-# this is your deployable
+
+* cd into this directory (where this README.md is)
+* wipe build/Contacts/ (it doesn't get cleaned between builds)
+* edit cache.appcache and update the timestamp (otherwise you won't be able to refresh your app)
+* edit index.html and update version string (search for Contacts.versionString)
+* execute "sencha app build package" (alternatively you could build testing)
+* navigate to build/Contacts/package (or testing)
+* this is your deployable
