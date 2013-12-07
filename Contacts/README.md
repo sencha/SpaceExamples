@@ -17,3 +17,9 @@ we're building this as "package", which doesn't utilize local storage. Hence, th
 * execute "sencha app build package" (alternatively you could build testing)
 * navigate to build/Contacts/package (or testing)
 * this is your deployable
+
+
+--------
+####Important
+Version 0.4.0 is built using : sencha app build, and deployed the content of build/production/Contacts
+If you experience any issues that are related to production build, follow the instructions above and re-deploy the app.
