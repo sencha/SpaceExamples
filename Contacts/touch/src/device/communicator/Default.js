@@ -65,7 +65,7 @@
  */
 Ext.define('Ext.device.communicator.Default', {
 
-    SERVER_URL: 'http://127.0.0.1:3000', // Change this to the correct server URL
+    SERVER_URL: 'http://localhost:3000', // Change this to the correct server URL
 
     callbackDataMap: {},
 
@@ -128,10 +128,6 @@ Ext.define('Ext.device.communicator.Default', {
 
     invoke: function(id, args) {
         var data = this.getCallbackData(id);
-
-        if (data.callback.args) {
-            console.log("INVOKE: ", JSON.stringify([].slice.call(data.callback.args), null,2));
-        }
 
         data.callback.apply(data.scope, args);
     },

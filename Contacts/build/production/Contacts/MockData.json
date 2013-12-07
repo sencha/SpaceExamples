@@ -1,0 +1,262 @@
+{
+	"contacts" : 
+	[
+		{ 
+			"id"          : "1000",
+			"displayName" : "Travel/Auto",
+			"title"       : "Emergencies Only",
+			"img"         : "images/Icon_Travel.png",
+			"firstName"   : "",
+			"lastName"    : "",
+			"middleName"  : "",
+			"notes"       : "This contact is for EMERGENCIES only! Please contact your department head for all other travel-related matter."
+		},
+		{ 
+			"id"          : "1001",
+			"displayName" : "IT",
+			"title"       : "All Issues",
+			"img"         : "images/Icon_IT.png",
+			"firstName"   : "",
+			"lastName"    : "",
+			"middleName"  : "",
+			"notes"       : "Can't login? Not sure if your computer is plugged in? Call us if it's an emergency otherwise please email!"
+		},
+		{ 
+			"id"          : "1002",
+			"displayName" : "Paramedics",
+			"title"       : "Health Emergencies",
+			"img"         : "images/Icon_Ambulance.png",
+			"firstName"   : "",
+			"lastName"    : "",
+			"middleName"  : "",
+			"notes"       : "Our on-campus parametic team average response time is 3 minutes; 911 is 8."
+		},
+		{ 
+			"id"          : "1003",
+			"displayName" : "Security",
+			"title"       : "Campus Police",
+			"img"         : "images/Icon_Security.png",
+			"firstName"   : "",
+			"lastName"    : "",
+			"middleName"  : "",
+			"notes"       : "All of our officers are trained in martial arts and will defend your honor if need shall arise."
+		},
+		{ 
+			"id"          : "1004",
+			"displayName" : "Facilities",
+			"title"       : "Maintenance",
+			"img"         : "images/Icon_Building.png",
+			"firstName"   : "",
+			"lastName"    : "",
+			"middleName"  : "",
+			"notes"       : "Elevator broken? Let's hope you're not inside of it! Contact us for any building an maintenance related issues."
+		},
+		{ 
+			"id"          : "1005",
+			"displayName" : "HR",
+			"title"       : "& Harassment",
+			"img"         : "images/Icon_HR.png",
+			"firstName"   : "",
+			"lastName"    : "",
+			"middleName"  : "",
+			"notes"       : "Your friendly HR folks are always ready to lend a sympathetic ear to your issues!"
+		},
+		{ 
+			"id"          : "1006",
+			"displayName" : "PR",
+			"title"       : "Emergencies ONLY",
+			"img"         : "images/Icon_PR.png",
+			"firstName"   : "",
+			"lastName"    : "",
+			"middleName"  : "",
+			"notes"       : "Bob is manning this cell phone 24/7 and gets very angry if it's not an emergency."
+		},
+		{ 
+			"id"          : "1007",
+			"displayName" : "Animal Control",
+			"title"       : "Pests Too",
+			"img"         : "images/Icon_Animal.png",
+			"firstName"   : "",
+			"lastName"    : "",
+			"middleName"  : "",
+			"notes"       : "Mountain lions ain't nohthing to sneeze at! If you see any, call us."
+		},
+		{ 
+			"id"          : "1008",
+			"displayName" : "Poison Control",
+			"title"       : "You Ate What",
+			"img"         : "images/Icon_Poison.png",
+			"firstName"   : "",
+			"lastName"    : "",
+			"middleName"  : "",
+			"notes"       : "Do not try to induce vomiting! Call us and we'll bring you a blend of herbs and chemicals to fix you right up!"
+		},
+		{ 
+			"id"          : "1009",
+			"displayName" : "Natural Disaster",
+			"title"       : "Duck and Cover",
+			"img"         : "images/Icon_Tornado.png",
+			"firstName"   : "",
+			"lastName"    : "",
+			"middleName"  : "",
+			"notes"       : "Why are you reading this? Duck and cover!"
+		},
+		{ 
+			"id"          : "1010",
+			"displayName" : "Zombie Attack",
+			"title"       : "Brains!",
+			"img"         : "images/Icon_Zombie.png",
+			"firstName"   : "",
+			"lastName"    : "",
+			"middleName"  : "",
+			"notes"       : "A zombie outbreak can be observed in the morning while the coffee machine is starting. Do not call if that is the case!"
+		}
+	],
+	"contactTypes": 
+	[
+		{
+			"id"       : "1000",
+			"parentId" : "1000",
+			"type"     : "Cell Phone",
+			"typeData" : "(452) 542-4324" 
+		},
+		{
+			"id"       : "1001",
+			"parentId" : "1000",
+			"type"     : "Work Phone",
+			"typeData" : "(452) 322-4344" 
+		},
+		{
+			"id"       : "1002",
+			"parentId" : "1000",
+			"type"     : "Email",
+			"typeData" : "travel@sencha.com" 
+		},
+		{
+			"id"       : "999",
+			"parentId" : "1001",
+			"type"     : "Chat",
+			"typeData" : "Chat With IT" 
+		},
+		{
+			"id"       : "1003",
+			"parentId" : "1001",
+			"type"     : "Email",
+			"typeData" : "it@sencha.com" 
+		},
+		{
+			"id"       : "1004",
+			"parentId" : "1001",
+			"type"     : "Work Phone",
+			"typeData" : "(452) 544-0077" 
+		},
+		{
+			"id"       : "1005",
+			"parentId" : "1002",
+			"type"     : "Email",
+			"typeData" : "911@sencha.com" 
+		},
+		{
+			"id"       : "1006",
+			"parentId" : "1002",
+			"type"     : "Work Phone",
+			"typeData" : "(452) 911-9111" 
+		},
+		{
+			"id"       : "1007",
+			"parentId" : "1003",
+			"type"     : "Email",
+			"typeData" : "security@sencha.com" 
+		},
+		{
+			"id"       : "1008",
+			"parentId" : "1003",
+			"type"     : "Work Phone",
+			"typeData" : "(452) 534-9111" 
+		},
+		{
+			"id"       : "1009",
+			"parentId" : "1004",
+			"type"     : "Email",
+			"typeData" : "maint@sencha.com" 
+		},
+		{
+			"id"       : "1010",
+			"parentId" : "1004",
+			"type"     : "Work Phone",
+			"typeData" : "(452) 985-1031" 
+		},
+		{
+			"id"       : "1011",
+			"parentId" : "1005",
+			"type"     : "Email",
+			"typeData" : "hr@sencha.com" 
+		},
+		{
+			"id"       : "1012",
+			"parentId" : "1005",
+			"type"     : "Work Phone",
+			"typeData" : "(824) 890-2174" 
+		},
+		{
+			"id"       : "1013",
+			"parentId" : "1006",
+			"type"     : "Cell Phone",
+			"typeData" : "(631) 523-9856" 
+		},
+		{
+			"id"       : "1014",
+			"parentId" : "1007",
+			"type"     : "Email",
+			"typeData" : "animals@sencha.com" 
+		},
+		{
+			"id"       : "1015",
+			"parentId" : "1007",
+			"type"     : "Work Phone",
+			"typeData" : "(824) 844-9752" 
+		},
+		{
+			"id"       : "1016",
+			"parentId" : "1007",
+			"type"     : "Cell Phone",
+			"typeData" : "(631) 324-9764" 
+		},
+		{
+			"id"       : "1017",
+			"parentId" : "1008",
+			"type"     : "Email",
+			"typeData" : "poison@sencha.com" 
+		},
+		{
+			"id"       : "1018",
+			"parentId" : "1008",
+			"type"     : "Cell Phone",
+			"typeData" : "(631) 752-9875" 
+		},
+		{
+			"id"       : "1019",
+			"parentId" : "1009",
+			"type"     : "Email",
+			"typeData" : "disaster@sencha.com" 
+		},
+		{
+			"id"       : "1020",
+			"parentId" : "1009",
+			"type"     : "Cell Phone",
+			"typeData" : "(631) 524-6432" 
+		},
+		{
+			"id"       : "1021",
+			"parentId" : "1010",
+			"type"     : "Email",
+			"typeData" : "zombies@sencha.com" 
+		},
+		{
+			"id"       : "1022",
+			"parentId" : "1010",
+			"type"     : "Cell Phone",
+			"typeData" : "(631) 234-1236" 
+		}
+	]
+}

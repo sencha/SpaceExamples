@@ -1,0 +1,818 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>Emergency Contacts</title>
+    <link rel="shortcut icon" href="favicon.ico" />
+    <style type="text/css">
+        html, body {
+            height: 100%;
+            background-color: #FCEBE4
+        }
+
+        #appLoadingIndicator {
+            position: absolute;
+            top: 50%;
+            margin-top: -50px;
+            text-align: center;
+            width: 100%;
+        }
+
+        #appLoadingIndicator div {
+          font-size: 9px;
+          font-style: italic;
+        }
+    </style>
+    <script type="text/javascript">
+        var Contacts = Contacts || {};
+        
+        Contacts.versionString = "Version 0.4.0"; // shown on mask and in contact view
+
+        // Set version on loading screen
+        Contacts.setVersionOnLoadingMask = function() {
+          var el = document.getElementById('version');
+          if (!el) {
+            setTimeout(Contacts.setVersionOnLoadingMask, 10);
+          }
+          else {
+            el.innerHTML = Contacts.versionString;
+          }
+        };
+        Contacts.setVersionOnLoadingMask();
+
+        // Generic error handler for debugging
+        window.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
+          alert("ERROR: " + errorMsg + "; URL: " + url + "; line: " + lineNumber);
+        };
+
+        // This addresses "double-reload" issue when upgrading production apps
+        // by popping up "app updated, reload?" prompt
+        // Check if a new cache is available on page load.
+        window.addEventListener('load', function(e) {
+          window.applicationCache.addEventListener('updateready', function(e) {
+            if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {
+              // Browser downloaded a new app cache.
+              // Swap it in and reload the page to get the new hotness.
+              window.applicationCache.swapCache();
+              if (confirm('A new version of this app is available. Load it?')) {
+                window.location.reload();
+              }
+            } else {
+              // Manifest didn't changed. Nothing new to server.
+            }
+          }, false);
+        }, false);
+    </script>
+
+    <!-- The line below must be kept intact for Sencha Command to build your application  -->
+    <script type="text/javascript">/**
+ * Sencha Blink
+ * @author Jacky Nguyen <jacky@sencha.com>
+ */
+(function(global) {
+    var emptyFn = function(){},
+        callbacks = [],
+        doc = global.document,
+        head = doc.head,
+        addWindowListener = global.addEventListener,
+        removeWindowListener = global.removeEventListener,
+        jsonParse = JSON.parse,
+        a = doc.createElement('a'),
+        documentLocation = doc.location,
+        documentUri = documentLocation.protocol + '//' + documentLocation.hostname + documentLocation.pathname + documentLocation.search,
+        manifestFile = 'app.json',
+        isRefreshing = false,
+        activeManifest, appCache, storage;
+
+    try {
+        storage = global.localStorage;
+        appCache = global.applicationCache;
+    }
+    catch(e) {}
+
+    function getManifestStorageKey(id) {
+        return id + '-' + documentUri + manifestFile;
+    }
+
+    function Manifest(manifest) {
+        var manifestContent;
+
+        if (typeof manifest == 'string') {
+            manifestContent = manifest;
+            manifest = jsonParse(manifestContent);
+        }
+        else {
+            manifestContent = JSON.stringify(manifest);
+        }
+
+        var applicationId = manifest.id,
+            key = getManifestStorageKey(applicationId),
+            assetMap = {};
+
+        function processAsset(asset) {
+            var uri;
+
+            if (typeof asset == 'string') {
+                asset = {
+                    path: asset
+                };
+            }
+
+            if (asset.shared) {
+                asset.version = asset.shared;
+                uri = asset.shared + asset.path;
+            }
+            else {
+                uri = toAbsoluteUri(asset.path);
+            }
+
+            asset.uri = uri;
+            asset.key = applicationId + '-' + uri;
+            assetMap[uri] = asset;
+
+            return asset;
+        }
+
+        function processAssets(assets, type) {
+            var ln = assets.length,
+                i, asset;
+
+            for (i = 0; i < ln; i++) {
+                asset = assets[i];
+
+                assets[i] = asset = processAsset(asset);
+
+                asset.type = type;
+                asset.index = i;
+                asset.collection = assets;
+                asset.ready = false;
+                asset.evaluated = false;
+            }
+
+            return assets;
+        }
+
+        this.key = key;
+        this.css = processAssets(manifest.css, 'css');
+        this.js = processAssets(manifest.js, 'js');
+
+        Ext.microloaded = true;
+
+        var filterPlatform = window.Ext.filterPlatform = function(platform) {
+            var profileMatch = false,
+                ua = navigator.userAgent,
+                j, jln;
+
+            platform = [].concat(platform);
+
+            function isPhone(ua) {
+                var isMobile = /Mobile(\/|\s)/.test(ua);
+
+                // Either:
+                // - iOS but not iPad
+                // - Android 2
+                // - Android with "Mobile" in the UA
+
+                return /(iPhone|iPod)/.test(ua) ||
+                          (!/(Silk)/.test(ua) && (/(Android)/.test(ua) && (/(Android 2)/.test(ua) || isMobile))) ||
+                          (/(BlackBerry|BB)/.test(ua) && isMobile) ||
+                          /(Windows Phone)/.test(ua);
+            }
+
+            function isTablet(ua) {
+                return !isPhone(ua) && (/iPad/.test(ua) || /Android|Silk/.test(ua) || /(RIM Tablet OS)/.test(ua) ||
+                    (/MSIE 10/.test(ua) && /; Touch/.test(ua)));
+            }
+
+            // Check if the ?platform parameter is set in the URL
+            var paramsString = window.location.search.substr(1),
+                paramsArray = paramsString.split("&"),
+                params = {},
+                testPlatform, i;
+
+            for (i = 0; i < paramsArray.length; i++) {
+                var tmpArray = paramsArray[i].split("=");
+                params[tmpArray[0]] = tmpArray[1];
+            }
+
+            testPlatform = params.platform;
+            if (testPlatform) {
+                return platform.indexOf(testPlatform) != -1;
+            }
+
+            for (j = 0, jln = platform.length; j < jln; j++) {
+                switch (platform[j]) {
+                    case 'phone':
+                        profileMatch = isPhone(ua);
+                        break;
+                    case 'tablet':
+                        profileMatch = isTablet(ua);
+                        break;
+                    case 'desktop':
+                        profileMatch = !isPhone(ua) && !isTablet(ua);
+                        break;
+                    case 'ios':
+                        profileMatch = /(iPad|iPhone|iPod)/.test(ua);
+                        break;
+                    case 'android':
+                        profileMatch = /(Android|Silk)/.test(ua);
+                        break;
+                    case 'blackberry':
+                        profileMatch = /(BlackBerry|BB)/.test(ua);
+                        break;
+                    case 'safari':
+                        profileMatch = /Safari/.test(ua) && !(/(BlackBerry|BB)/.test(ua));
+                        break;
+                    case 'chrome':
+                        profileMatch = /Chrome/.test(ua);
+                        break;
+                    case 'ie10':
+                        profileMatch = /MSIE 10/.test(ua);
+                        break;
+                    case 'windows':
+                        profileMatch = /MSIE 10/.test(ua) || /Trident/.test(ua);
+                        break;
+                    case 'tizen':
+                        profileMatch = /Tizen/.test(ua);
+                        break;
+                    case 'firefox':
+                        profileMatch = /Firefox/.test(ua);
+                }
+                if (profileMatch) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        this.css = this.css.filter(function(css) {
+            var platform = css.platform,
+                exclude = css.exclude;
+
+            if (platform) {
+                if (filterPlatform(platform) && !filterPlatform(exclude)) {
+                    Ext.theme = {
+                        name: css.theme || 'Default'
+                    };
+                    return true;
+                }
+                css.filtered = true;
+                return false;
+            }
+            return true;
+        });
+
+        this.js = this.js.filter(function(js) {
+            var platform = js.platform,
+                exclude = js.exclude;
+
+            if (platform) {
+                if (filterPlatform(platform) && !filterPlatform(exclude)) {
+                    return true;
+                }
+                else {
+                    js.filtered = true;
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        this.assets = this.css.concat(this.js);
+        this.getAsset = function(uri) {
+            return assetMap[uri];
+        };
+        this.store = function() {
+            store(key, manifestContent);
+        };
+    }
+
+    if (typeof global.Ext === 'undefined') {
+        var Ext = global.Ext = {};
+    }
+
+    function toAbsoluteUri(uri) {
+        a.href = uri;
+        return a.href;
+    }
+
+    function addMeta(name, content) {
+        var meta = document.createElement('meta');
+
+        meta.setAttribute('name', name);
+        meta.setAttribute('content', content);
+        head.appendChild(meta);
+    }
+
+    function request(uri, isShared, onSuccess, onFailure) {
+        (isShared ? requestIframe : requestXhr)(uri, onSuccess, onFailure);
+    }
+
+    function requestXhr(uri, onSuccess, onFailure) {
+        var xhr = new XMLHttpRequest();
+
+        onFailure = onFailure || emptyFn;
+
+        uri = uri + ((uri.indexOf('?') == -1) ? '?' : '&') + Date.now();
+
+        try {
+            xhr.open('GET', uri, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4) {
+                    var status = xhr.status,
+                        content = xhr.responseText;
+
+                    if ((status >= 200 && status < 300) || status == 304 || (status == 0 && content.length > 0)) {
+                        onSuccess(content);
+                    }
+                    else {
+                        onFailure();
+                    }
+                }
+            };
+            xhr.send(null);
+        } catch (e) {
+            onFailure();
+        }
+    }
+
+    function requestIframe(uri, onSuccess) {
+        var iframe = doc.createElement('iframe');
+
+        callbacks.push({
+            iframe: iframe,
+            callback: onSuccess
+        });
+
+        iframe.src = uri + '.html';
+        iframe.style.cssText = 'width:0;height:0;border:0;position:absolute;z-index:-999;visibility:hidden';
+        doc.body.appendChild(iframe);
+    }
+
+    function requestAsset(asset, onSuccess, onFailure) {
+        var isRemote = !!asset.remote,
+            isShared = !!asset.shared;
+
+        if (isRemote) {
+            onSuccess('');
+            return;
+        }
+
+        if (!isShared && asset.version && asset.version.length) {
+            var onRequestSuccess = onSuccess,
+                version = asset.version,
+                versionLn = version.length,
+                checksumFail, checksumType;
+
+            onSuccess = function(content) {
+                checksumType = content.substring(0, 1);
+                if (checksumType == '/') {
+                    if (content.substring(2, versionLn + 2) !== version) {
+                        checksumFail = true;
+                    }
+                }
+                else if (checksumType == 'f') {
+                    if (content.substring(9, versionLn + 9) !== version) {
+                        checksumFail = true;
+                    }
+                }
+                else if (checksumType == '.') {
+                    if (content.substring(1, versionLn + 1) !== version) {
+                        checksumFail = true;
+                    }
+                }
+                if (checksumFail === true) {
+                    if (confirm("Requested: '" + asset.uri + " seems to have been changed. Attempt to refresh the application?")) {
+                        refresh();
+                    }
+                    return;
+                }
+                onRequestSuccess(content);
+            };
+        }
+
+        request(asset.uri, isShared, onSuccess, onFailure);
+    }
+
+    function onMessage(e) {
+        var data = e.data,
+            sourceWindow = e.source.window,
+            i, ln, callback, iframe;
+
+        for (i = 0, ln = callbacks.length; i < ln; i++) {
+            callback = callbacks[i];
+            iframe = callback.iframe;
+
+            if (iframe.contentWindow === sourceWindow) {
+                callback.callback(data);
+                doc.body.removeChild(iframe);
+                callbacks.splice(i, 1);
+                return;
+            }
+        }
+    }
+
+    function patch(content, delta) {
+        var output = [],
+            chunk, i, ln;
+
+        if (delta.length === 0) {
+            return content;
+        }
+
+        for (i = 0,ln = delta.length; i < ln; i++) {
+            chunk = delta[i];
+
+            if (typeof chunk === 'number') {
+                output.push(content.substring(chunk, chunk + delta[++i]));
+            }
+            else {
+                output.push(chunk);
+            }
+        }
+
+        return output.join('');
+    }
+
+    function log(message) {
+        if (typeof console != 'undefined') {
+            (console.error || console.log).call(console, message);
+        }
+    }
+
+    function store(key, value) {
+        try {
+            storage.setItem(key, value);
+        }
+        catch (e) {
+            if (storage && e.code == e.QUOTA_EXCEEDED_ERR && activeManifest) {
+                log("LocalStorage Quota exceeded, cannot store " + key + " locally");
+                // Quota exceeded, clean up unused items
+//                var items = activeManifest.assets.map(function(asset) {
+//                        return asset.key;
+//                    }),
+//                    i = 0,
+//                    ln = storage.length,
+//                    cleaned = false,
+//                    item;
+//
+//                items.push(activeManifest.key);
+//
+//                while (i <= ln - 1) {
+//                    item = storage.key(i);
+//
+//                    if (items.indexOf(item) == -1) {
+//                        storage.removeItem(item);
+//                        cleaned = true;
+//                        ln--;
+//                    }
+//                    else {
+//                        i++;
+//                    }
+//                }
+
+                // Done cleaning up, attempt to store the value again
+                // If there's still not enough space, no other choice
+                // but to skip this item from being stored
+//                if (cleaned) {
+//                    store(key, value);
+//                }
+            }
+        }
+    }
+
+    function retrieve(key) {
+        try {
+            return storage.getItem(key);
+        }
+        catch (e) {
+            // Private browsing mode
+            return null;
+        }
+    }
+
+    function retrieveAsset(asset) {
+        return retrieve(asset.key);
+    }
+
+    function storeAsset(asset, content) {
+        return store(asset.key, content);
+    }
+
+    function refresh() {
+        if (!isRefreshing) {
+            isRefreshing = true;
+            requestXhr(manifestFile, function(content) {
+                new Manifest(content).store();
+                global.location.reload();
+            });
+        }
+    }
+
+    function blink(currentManifest) {
+        var currentAssets = currentManifest.assets,
+            assetsCount = currentAssets.length,
+            newManifest;
+
+        activeManifest = currentManifest;
+
+        addWindowListener('message', onMessage, false);
+
+        function onAssetReady(asset, content) {
+            var assets = asset.collection,
+                index = asset.index,
+                ln = assets.length,
+                i;
+
+            asset.ready = true;
+            asset.content = content;
+
+            for (i = index - 1; i >= 0; i--) {
+                asset = assets[i];
+                if (!asset.filtered && (!asset.ready || !asset.evaluated)) {
+                    return;
+                }
+            }
+
+            for (i = index; i < ln; i++) {
+                asset = assets[i];
+                if (asset.ready) {
+                    if (!asset.evaluated) {
+                        evaluateAsset(asset);
+                    }
+                }
+                else {
+                    return;
+                }
+            }
+        }
+
+        function evaluateAsset(asset) {
+            asset.evaluated = true;
+
+            if (asset.type == 'js') {
+                try {
+                    eval(asset.content);
+                }
+                catch (e) {
+                    log("Error evaluating " + asset.uri + " with message: " + e);
+                }
+            }
+            else {
+                var style = doc.createElement('style'),
+                    base;
+
+                style.type = 'text/css';
+                style.textContent = asset.content;
+
+                if ('id' in asset) {
+                    style.id = asset.id;
+                }
+
+                if ('disabled' in asset) {
+                    style.disabled = asset.disabled;
+                }
+
+                base = document.createElement('base');
+                base.href = asset.path.replace(/\/[^\/]*$/, '/');
+                head.appendChild(base);
+                head.appendChild(style);
+                head.removeChild(base);
+            }
+
+            delete asset.content;
+
+            if (--assetsCount == 0) {
+                onReady();
+            }
+        }
+
+        function onReady() {
+            var updatingAssets = [],
+                appCacheReady = false,
+                onAppCacheIdle = function() {},
+                onAppCacheReady = function() {
+                    appCache.swapCache();
+                    appCacheReady = true;
+                    onAppCacheIdle();
+                },
+                updatingCount;
+
+            removeWindowListener('message', onMessage, false);
+
+            if (appCache.status == appCache.UPDATEREADY) {
+                onAppCacheReady();
+            }
+            else if (appCache.status == appCache.CHECKING || appCache.status == appCache.DOWNLOADING) {
+                appCache.onupdateready = onAppCacheReady;
+                appCache.onnoupdate = appCache.onobsolete = function() {
+                    onAppCacheIdle();
+                };
+            }
+
+            function notifyUpdateIfAppCacheReady() {
+                if (appCacheReady) {
+                    notifyUpdate();
+                }
+            }
+
+            function notifyUpdate() {
+                var updatedCallback = Ext.onUpdated || emptyFn;
+
+                if ('onSetup' in Ext) {
+                    Ext.onSetup(updatedCallback);
+                }
+                else {
+                    updatedCallback();
+                }
+            }
+
+            function doUpdate() {
+                newManifest.store();
+
+                updatingAssets.forEach(function(asset) {
+                    storeAsset(asset, asset.content);
+                });
+
+                notifyUpdate();
+            }
+
+            function onAssetUpdated(asset, content) {
+                asset.content = content;
+
+                if (--updatingCount == 0) {
+                    if (appCache.status == appCache.IDLE) {
+                        doUpdate();
+                    }
+                    else {
+                        onAppCacheIdle = doUpdate;
+                    }
+                }
+            }
+
+            function checkForUpdate() {
+                removeWindowListener('online', checkForUpdate, false);
+                requestXhr(manifestFile, function(manifestContent) {
+                    activeManifest = newManifest = new Manifest(manifestContent);
+
+                    var assets = newManifest.assets,
+                        currentAsset;
+
+                    assets.forEach(function(asset) {
+                        currentAsset = currentManifest.getAsset(asset.uri);
+
+                        if (!currentAsset || asset.version !== currentAsset.version) {
+                            updatingAssets.push(asset);
+                        }
+                    });
+
+                    updatingCount = updatingAssets.length;
+
+                    if (updatingCount == 0) {
+                        if (appCache.status == appCache.IDLE) {
+                            notifyUpdateIfAppCacheReady();
+                        }
+                        else {
+                            onAppCacheIdle = notifyUpdateIfAppCacheReady;
+                        }
+                        return;
+                    }
+
+                    updatingAssets.forEach(function(asset) {
+                        var currentAsset = currentManifest.getAsset(asset.uri),
+                            path = asset.path,
+                            update = asset.update;
+
+                        function updateFull() {
+                            requestAsset(asset, function(content) {
+                                onAssetUpdated(asset, content);
+                            });
+                        }
+
+                        // New asset (never used before)
+                        // OR Shared from CDN
+                        // OR Missing local storage
+                        // OR Full update
+                        if (!currentAsset || !update || retrieveAsset(asset) === null || update != 'delta') {
+                            updateFull();
+                        }
+                        else {
+                            requestXhr('deltas/' + path + '/' + currentAsset.version + '.json',
+                                function(content) {
+                                    try {
+                                        onAssetUpdated(asset, patch(retrieveAsset(asset), jsonParse(content)));
+                                    }
+                                    catch (e) {
+                                        log("Malformed delta content received for " + asset.uri);
+                                    }
+                                },
+                                updateFull
+                            );
+                        }
+                    })
+                });
+            }
+
+            if (navigator.onLine !== false) {
+                checkForUpdate();
+            }
+            else {
+                addWindowListener('online', checkForUpdate, false);
+            }
+        }
+
+        if (assetsCount == 0) {
+            onReady();
+            return;
+        }
+
+        currentAssets.forEach(function(asset) {
+            var content = retrieveAsset(asset);
+
+            if (content === null) {
+                requestAsset(asset, function(content) {
+                    if (!asset.remote) {
+                        storeAsset(asset, content);
+                    }
+                    onAssetReady(asset, content);
+                }, function() {
+                    onAssetReady(asset, '');
+                });
+            }
+            else {
+                onAssetReady(asset, content);
+            }
+        });
+    }
+
+    function blinkOnDomReady(manifest) {
+        if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
+            var msViewportStyle = document.createElement("style");
+            msViewportStyle.appendChild(
+                document.createTextNode(
+                    "@media screen and (orientation: portrait) {" +
+                        "@-ms-viewport {width: 320px !important;}" +
+                    "}" +
+                    "@media screen and (orientation: landscape) {" +
+                        "@-ms-viewport {width: 560px !important;}" +
+                    "}"
+                )
+            );
+            document.getElementsByTagName("head")[0].appendChild(msViewportStyle);
+        }
+
+        var readyStateRe =  (/MSIE 10/.test(navigator.userAgent)) ? /complete|loaded/ : /interactive|complete|loaded/;
+        if (doc.readyState.match(readyStateRe) !== null) {
+            blink(manifest);
+        }
+        else {
+            addWindowListener('DOMContentLoaded', function() {
+                if (navigator.standalone) {
+                    // When running from Home Screen, the splash screen will not disappear until all
+                    // external resource requests finish.
+                    // The first timeout clears the splash screen
+                    // The second timeout allows inital HTML content to be displayed
+                    setTimeout(function() {
+                        setTimeout(function() {
+                            blink(manifest);
+                        }, 1);
+                    }, 1);
+                }
+                else {
+                  setTimeout(function() {
+                    blink(manifest);
+                  }, 1);
+                }
+            }, false);
+        }
+    }
+
+    Ext.blink = function(manifest) {
+        var manifestContent = retrieve(getManifestStorageKey(manifest.id));
+
+        addMeta('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no');
+        addMeta('apple-mobile-web-app-capable', 'yes');
+        addMeta('apple-touch-fullscreen', 'yes');
+
+        if (manifestContent) {
+            manifest = new Manifest(manifestContent);
+            blinkOnDomReady(manifest);
+        }
+        else {
+            requestXhr(manifestFile, function(content) {
+                manifest = new Manifest(content);
+                manifest.store();
+                blinkOnDomReady(manifest);
+            });
+        }
+    };
+})(this);Ext.blink({id:'08336e52-b41f-4155-9272-6f32e7229c56'});</script>
+    <script type="text/javascript" src="http://space.sencha.io/space.js"></script>
+</head>
+<body>
+    <div id="appLoadingIndicator">
+        <img alt="" src="data:image/gif;base64,R0lGODlhyACLALMPAFVVVe6JYPvy7+txQPbFsc9YJ6WlpfOpjPnYyq1JINDR0fni2OljLWdnZ6SkpP///yH/C05FVFNDQVBFMi4wAwEAAAAh/wtYTVAgRGF0YVhNUDw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDozQUEzODIyRTExMjA2ODExOEMxNERFRTg1ODk2RjM5OSIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDoyQjhDNDk4NENGQUExMUUyQjRFQzlCNEFERjM5QkMxOCIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDoyQjhDNDk4M0NGQUExMUUyQjRFQzlCNEFERjM5QkMxOCIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M2IChNYWNpbnRvc2gpIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6RkU3RjExNzQwNzIwNjgxMTgwODNDMkVENjJEOUY3NjkiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6M0FBMzgyMkUxMTIwNjgxMThDMTRERUU4NTg5NkYzOTkiLz4gPC9yZGY6RGVzY3JpcHRpb24+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" />
+        <div id="version"></div>
+    </div>
+</body>
+</html>

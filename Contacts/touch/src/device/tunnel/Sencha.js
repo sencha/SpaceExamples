@@ -67,19 +67,12 @@ Ext.define('Ext.device.tunnel.Sencha', {
     doSend: function(receiverId, messageId, message, foreground) {
         var promise = new Ext.Promise;
 
-        var success = function(result) {
-                console.warn("RESULT", receiverId, messageId, result)
-                    promise.fulfill(result);
-                };
-
-                success.args = arguments;
-
-        console.warn("GOING OUT", receiverId, messageId, message);
-
         Ext.device.Communicator.send({
             command: 'Tunnel#send',
             callbacks: {
-                success: success,
+                success: function(result) {
+                    promise.fulfill(result);
+                },
                 failure: function(reason) {
                     promise.reject(reason);
                 }
