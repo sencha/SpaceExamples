@@ -1,3 +1,6 @@
+/**
+ * @private
+ */
 Ext.define('Ext.Promise', {
     statics: {
         when: function() {
@@ -11,9 +14,6 @@ Ext.define('Ext.Promise', {
                 ret.reject(e);
             }
 
-            /**
-             * @param [result]
-             */
             function onFulfilled(result) {
                 promise = promises.shift();
 
@@ -49,9 +49,6 @@ Ext.define('Ext.Promise', {
                 next(promise);
             }
 
-            /**
-             * @param [result]
-             */
             function onFulfilled(result) {
                 promise = promises.shift();
                 fulfilledResults.push(result);
@@ -189,12 +186,11 @@ Ext.define('Ext.Promise', {
 
             while (listener = listeners.shift()) {
                 success = listener.success;
+                scope = listener.scope;
+                promise = listener.promise;
+                delete promise.$owner;
 
                 if (success) {
-                    scope = listener.scope;
-                    promise = listener.promise;
-                    delete promise.$owner;
-
                     callbackResults = success.apply(scope, results);
 
                     if (callbackResults instanceof Ext.Promise) {
@@ -203,6 +199,9 @@ Ext.define('Ext.Promise', {
                     else {
                         promise.fulfill(callbackResults);
                     }
+                }
+                else {
+                    promise.fulfill(results);
                 }
             }
 

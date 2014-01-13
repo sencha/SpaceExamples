@@ -7,11 +7,12 @@ Ext.define('Ext.device.Tunnel', {
     ],
 
     constructor: function() {
-        if (!!window.isNK) {
+        var browserEnv = Ext.browser.is;
+
+        if (browserEnv.Sencha) {
             return Ext.create('Ext.device.tunnel.Sencha');
         }
-        else {
-            return Ext.create('Ext.device.tunnel.Simulator');
-        }
+
+        return Ext.create('Ext.device.tunnel.Simulator');
     }
 });

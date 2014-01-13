@@ -63,7 +63,8 @@ Ext.define('Ext.device.tunnel.Abstract', {
 
     /**
      * Broadcast a message (intent) to look for receivers who can respond to it
-     * @param message
+     * @param {String} message
+     *
      * @returns {Ext.Promise} A promise which provides an array of objects upon fulfilled. Each object contains information about
      * a receiver, with 'id', 'name' and 'icon' keys.
      */
@@ -138,7 +139,7 @@ Ext.define('Ext.device.tunnel.Abstract', {
     /**
      * Assign the callback to handling incoming messages. The returned value will be passed back to the sender.
      * If the operation needs to be async, simply return an instance of Ext.Promise
-     * @param callback
+     * @param {Function} callback
      */
     onMessage: function(callback) {
         var queue = this.messageQueue.slice(0),
@@ -185,7 +186,6 @@ Ext.define('Ext.device.tunnel.Abstract', {
      * @private
      */
     onReceived: function(data) {
-        console.warn('ON RECEIVED ', JSON.stringify(data, null, 2));
         var appId = data.appId,
             message = data.message,
             messageId = data.id,
@@ -250,7 +250,6 @@ Ext.define('Ext.device.tunnel.Abstract', {
                 this.doSend(appId, messageId, {
                     error: e
                 }, foreground);
-                throw e;
             }
         }
 
