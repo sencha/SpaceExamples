@@ -1,0 +1,163 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta id="extViewportMeta" name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <title>Sensors</title>
+    <style type="text/css">
+        button {
+            font-size: 100%;
+        }
+
+        #log {
+            padding: 20px;
+        }
+
+        #invokeResults {
+            color: red;
+            font-weight: bold;
+        }
+
+        img {
+
+            height: 200px;
+            width: 200px;
+            padding: 3px;
+            margin: 3px;
+            border: 1px solid gray;
+        }
+
+    </style>
+    <!--<script src="http://space.sencha.io/space.js"></script>-->
+
+    <!--<script src="http://space.sencha.io/dev/space.js"></script>-->
+
+    <script src="http://tests.sencha.local:3000/out/space.js"></script>
+
+ 
+</head>
+<body>
+<h1>Secure Files</h1>
+
+<button id="listFiles">Reload List</button>
+<button id="getPhoto">Add Photo</button>
+<button id="deleteFiles">Delete All</button>
+
+
+<div id="fileList"></div>
+<div id="log"></div>
+<script type="text/javascript">
+    window.onerror = function(a, b, c) {
+        alert(a + ' ' + b + ' ' + c);
+    };
+</script>
+
+
+<script type="text/javascript">
+
+
+var photos;
+
+
+function log(message) {
+    var div = document.createElement('div');
+
+    div.textContent = message;
+    console.log(message);
+
+    document.getElementById('log').appendChild(div);
+}
+
+Ext.onSpaceReady(function(){
+   
+    log("Space Ready");
+
+    photos = Ext.space.SecureFiles.get('photos');
+
+    wireCamera();
+    wireListFiles();
+    wireDelete();
+
+    loadImageList();
+
+});
+
+
+
+
+function wireListFiles(){
+    var button = document.getElementById("listFiles");
+
+    button.addEventListener('click', loadImageList, true);
+}
+
+
+function loadImageList() {
+
+    var div = document.getElementById("fileList");
+
+    div.innerHTML = "";
+
+    photos.keys().then(function(fileNames){
+        log("image count: " + fileNames.length);
+        if(fileNames.length == 0){
+            div.innerHTML = "No Images";
+        }
+        for(var i =0, l = fileNames.length; i<l; i++){
+            photos.get(fileNames[i]).then(function(content){
+                var img = document.createElement("img");
+                img.src = "data:image/jpeg;base64," + content;
+                div.appendChild(img);
+            });
+        }
+    });
+
+}
+
+
+function wireDelete(){
+    var button = document.getElementById("deleteFiles");
+
+    button.addEventListener('click', function() {
+       
+        photos.clear().then(function(){
+            var div = document.getElementById("fileList");
+            div.innerHTML = "No Images";
+            log("images deleted");
+        });
+
+    }, true);
+}
+
+function wireCamera(){
+    var button = document.getElementById("getPhoto");
+
+    button.addEventListener('click', function() {
+       
+        var result = Ext.space.Camera.capture({
+            quality: 75,
+            width: 200,
+            height: 200,
+            source: 'library',
+            encoding: 'jpeg',
+            destination: 'data'
+        });
+
+
+        result.then(function(image){
+            log("user chose image");
+            photos.set(new Date().getTime()+".jpg", image).then(function(){
+                log("image saved");
+                loadImageList();
+            });
+        })
+
+    }, true);
+}
+
+</script>
+</body>
+</html>
