@@ -1,0 +1,17 @@
+/**
+ * @file _fonts.scss
+ * @author Simon Brunel
+ */
+
+// Custom icon font
+@include icon-font(
+    'Pictos',
+    inline-font-files(
+        'pictos/pictos.woff', woff,
+        'pictos/pictos.ttf', truetype,
+        'pictos/pictos.woff', eot,
+        'pictos/pictos.svg', svg
+));
+
+@include icon('add', 'a', 'Pictos');
+@include icon('delete', 'd', 'Pictos');

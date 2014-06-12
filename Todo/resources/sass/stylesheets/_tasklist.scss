@@ -1,0 +1,60 @@
+/**
+ * @file _list.scss
+ * @author Simon Brunel
+ */
+
+@import "compass/css3/transition";
+
+.tasklist {
+    .x-form {
+        padding: 0.4em;
+
+        .x-button,
+        .x-field-text {
+            border-color: darken($base-color, 5%);
+            border-style: solid;
+        }
+
+        .x-field-text,
+        .x-input-text {
+            border-radius: $button-radius 0 0 $button-radius !important;
+        }
+
+        .x-field-text {
+            border-width: 1px 0 1px 1px;
+        }
+
+        .x-button {
+            border-radius: 0 $button-radius $button-radius 0 !important;
+            border-width: 1px 1px 1px 0;
+        }
+
+    }
+
+    .x-list {
+        .x-list-item > .x-innerhtml > div {
+            @include single-transition(all, 0.5s, ease, 0);
+
+            > div {
+                @include ellipsis;
+                font-weight: bold;
+            }
+
+            &.task-done {
+                color: gray;
+
+                &:before {
+                    content: 'c';
+                    display: block;
+                    font-family: 'Pictos';
+                    position: absolute;
+                }
+
+                > div {
+                    padding-left: 24px;
+                    text-decoration: line-through;
+                }
+            }
+        }
+    }
+}

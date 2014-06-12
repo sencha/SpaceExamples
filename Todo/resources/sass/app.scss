@@ -1,0 +1,24 @@
+/**
+ * @file app.scss
+ * @author Simon Brunel
+ */
+
+// Overrides
+// @see http://docs.sencha.com/touch/2-1/#!/api/Global_CSS
+$base-color: #eae8e7;
+$accent-color: #eb652f;
+$include-pictos-font: false;
+$include-default-icons: false;
+$font-family: 'Klavika-Regular';
+
+// The following two lines import the default Sencha Touch theme. If you are building
+// a new theme, remove them and the add your own CSS on top of the base CSS (which
+// is already included in your app.json file).
+@import 'sencha-touch/default';
+@import 'sencha-touch/default/all';
+
+// Custom code goes here..
+@import 'stylesheets/_fonts.scss';
+@import 'stylesheets/_icons.scss';
+@import 'stylesheets/_button.scss';
+@import 'stylesheets/_tasklist.scss';

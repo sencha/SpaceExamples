@@ -1,0 +1,18 @@
+/**
+ * @file _fonts.scss
+ * @author Simon Brunel
+ */
+
+@import 'compass/css3';
+
+@include font-face(
+    'Klavika-Regular',
+    font-files(
+        'klavika/Klavika-Regular.woff',
+        'klavika/Klavika-Regular.eot',
+        'klavika/Klavika-Regular.ttf',
+        'klavika/Klavika-Regular.svg'
+    ),
+    false,
+    normal,
+    normal);
