@@ -40,7 +40,7 @@
      */
     "js": [
         {
-            "path": "http://space.sencha.io/space.js"
+            "path": "http://space.sencha.io/beta/space.js"
         },
         {
             "path": "touch/sencha-touch.js",
