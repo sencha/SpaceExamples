@@ -623,7 +623,7 @@ Ext.define('App.util.data.proxy.SecureSql', {
 
         Ext.onSpaceReady().then(function() {
             return Ext.space.Sqlite.openDatabase({
-                name: 'Sencha Database 2',
+                name: 'Sencha Database',
                 version: '1.0',// we will do version tracking outside of the sqlite db version system.
                 displayName: "Sencha",
                 estimatedSize: 5 * 1024 * 1024 //we auto extend on the native side, setting the size is vestigial at this point.
