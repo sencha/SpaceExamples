@@ -1,0 +1,13 @@
+<ul id="applications">
+	<li ng-repeat="app in apps" ng-click="openApp(app)">
+		<em ng-show="app.vpn">vpn</em>
+		<i class="fa fa-angle-right"></i> 
+		<h5><img ng-show="app.icon" src="{{app.icon}}" /> {{app.name}} <small>
+			<ng-pluralize count="app.favorites.length"
+                 when="{'0': '',
+                     'one': '1 favorite',
+                     'other': '{} favorites'}">
+			</ng-pluralize>
+		</small></h5>
+	</li>
+</ul>
