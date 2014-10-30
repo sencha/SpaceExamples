@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta id="extViewportMeta" name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <title>Download</title>
+    <style type="text/css">
+        button {
+            font-size: 100%;
+        }
+
+        #log {
+            padding: 20px;
+        }
+
+        #invokeResults {
+            color: red;
+            font-weight: bold;
+        }
+
+        img {
+
+            height: 200px;
+            width: 200px;
+            padding: 3px;
+            margin: 3px;
+            border: 1px solid gray;
+        }
+
+    </style>    
+    <script src="http://space.sencha.io/beta/space.js"></script>
+
+</head>
+<body>
+<h1>Downloads</h1>
+<div>
+    <select id = "downloadSelect">
+        <option>One</option>
+        <option>Two</option>
+        <option>Three</option>
+        <option>Four</option>
+    </select>
+</div>
+<br/>
+<button id="downloadFiles" disabled>Download Things</button>
+<button id="deleteDownloads" disabled>Delete Downloads</button>
+
+<hr/>
+<div id="downloadProgressOne"></div>
+
+<div id="downloadProgressTwo"></div>
+
+<div id="downloadProgressThree"></div>
+
+<div id="downloadProgressFour"></div>
+
+<div id="importCounter"></div>
+<div id="log"></div>
+<script type="text/javascript">
+    window.onerror = function(a, b, c) {
+        alert(a + ' ' + b + ' ' + c);
+    };
+</script>
+
+
+<script type="text/javascript" src="app.js"></script>
+</body>
+</html>

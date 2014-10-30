@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta id="extViewportMeta" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-touch-fullscreen" content="yes">
+<title>Fullscreen Test</title>
+<style type="text/css">
+button {
+    font-size: 100%;
+}
+
+#log {
+    font-size: 80%;
+    margin-top: 30px;
+    padding: 5px;
+    border-top: 1px dotted #ddd;
+}
+</style>
+<script type="text/javascript" src="http://space.sencha.io/beta/space.js"></script>
+</head>
+<body>
+<h1>Fullscreen Test</h1>
+
+<button id="toggle"><span id="direction">Toggle</span> fullscreen</button>
+<button id="check">Test?</button>
+
+<pre id="log"></pre>
+
+<script type="text/javascript">
+
+
+function log(message) {
+    console.log(message);
+    document.getElementById("log").textContent += "\n" + message;
+}
+
+
+// React to a fullscreen mode change, whether via Ext.space.Fullscreen.enter/leave,
+// or by user gesture in the client app
+function handleToggle(isFullscreen) {
+    // toggle the button text to reflect the current mode
+    document.getElementById("direction").textContent = isFullscreen ? "Leave" : "Enter";
+}
+
+
+// Toggle in and out of fullscreen mode
+function toggle() {
+    log("Toggling...");
+    if (Ext.space.Fullscreen.isEnabled) {
+        Ext.space.Fullscreen.leave().then(function() {
+            log("Done leaving fullscreen.");
+        });
+
+    } else {
+        Ext.space.Fullscreen.enter().then(function() {
+            log("Done entering fullscreen.");
+        });
+    }
+}
+
+
+// Check whether we're in fullscreen mode or not
+function check() {
+    alert("Fullscreen mode is " + (Ext.space.Fullscreen.isEnabled ? "ON" : "OFF"));
+}
+
+
+Ext.onSpaceReady(function(){
+    log("Space Ready");
+
+    // wire up the fullscreen mode change listener, and get the initial mode
+    Ext.space.Fullscreen.onToggle(handleToggle);
+    Ext.space.Fullscreen.ready().then(function() {
+        handleToggle(Ext.space.Fullscreen.isEnabled);
+    });
+
+    // wire up the button to toggle fullscreen mode
+    document.getElementById("toggle").addEventListener("click", toggle, true);
+
+    // wire up the fullscreen mode checker
+    document.getElementById("check").addEventListener("click", check, true);
+});
+
+
+</script>
+</body>
+</html>

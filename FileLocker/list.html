@@ -1,0 +1,23 @@
+<div class="search">
+	<div class="search-input">
+		<input type="text" ng-init="showFilter=false" ng-click="showFilter=true" ng-model="search.name" placeholder="Filter Files"/>
+	</div>
+	<!-- create selector directive -->
+	<div ng-show="showFilter" class="filter">
+		<div ng-repeat="filter in filterTypes">
+			<div ng-click="toggleFilter($event, filter)" class="icon {{filter.name}}" ng-class="{'disabled':!showTypes[filter.name]}">
+				{{filter.name | uppercase}}
+			</div>
+		</div>
+	</div>
+</div>
+<!---->
+<div class="list" ng-repeat="file in files | filter:search.name | filetype: showTypes | orderBy:'modified':true">
+	<div class="list-item"  ng-click="openFile(file)">
+		<div class="icon {{file.type | lowercase }}">{{file.type | uppercase}}</div>
+		<h2>{{file.name}}</h2>
+		<p><span class="app">{{file.appName}}</span><span class="date">{{file.modified | date}}</span></p>
+		<span class="size">{{file.size | bytes}}</span>
+		<span class="delete"  ng-click="confirmDelete(file, $event)">6</span>
+	</div>			
+</div>
