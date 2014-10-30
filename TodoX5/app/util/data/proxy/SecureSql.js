@@ -15,7 +15,7 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
             var records = operation.getRecords(),
                 tableExists = me.getTableExists();
 
-            db.transaction().then(function(transaction) {
+            db.transaction().then(function (transaction) {
                 me.insertRecords(records, transaction, function (resultSet, error) {
                     if (error) {
                         operation.setException(error);
@@ -34,7 +34,7 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
         
     },
 
-    read: function(operation, callback, scope) {
+    read: function (operation, callback, scope) {
         var me = this,
             model = me.getModel(),
             idProperty = model.getIdProperty(),
@@ -70,7 +70,7 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
                     }
 
                     if (filters && filters.length) {
-                        filtered = Ext.create('Ext.util.Collection', function(record) {
+                        filtered = Ext.create('Ext.util.Collection', function (record) {
                             return record.getId();
                         });
                         filtered.setFilterRoot('data');
@@ -97,7 +97,7 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
         });
     },
 
-    update: function(operation, callback, scope) {
+    update: function (operation, callback, scope) {
         var me = this,
             records = operation.getRecords(),
             tableExists = me.getTableExists();
@@ -125,7 +125,7 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
         
     },
 
-    erase: function(operation, callback, scope) {
+    erase: function (operation, callback, scope) {
         var me = this,
             records = operation.getRecords(),
             tableExists = me.getTableExists();
@@ -149,7 +149,7 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
 
     },
 
-    insertRecords: function(records, transaction, callback, scope) {
+    insertRecords: function (records, transaction, callback, scope) {
         var me = this,
             table = me.getTable(),
             columns = me.getColumns(),
@@ -177,7 +177,9 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
                 values = me.getColumnValues(columns, data);
 
             transaction.executeSql(
-                'INSERT INTO ' + table + ' (' + columns.join(', ') + ') VALUES (' + placeholders + ')', values).then(
+                'INSERT INTO ' + table + ' (' + columns.join(', ') + ') VALUES (' + placeholders + ')',
+                values
+            ).then(
                 function (resultSet) {
                     executed++;
                     record.setId(uniqueIdStrategy ? id : resultSet.insertId);
@@ -188,7 +190,7 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
                         callback.call(scope || me, result, errors.length > 0 ? errors : null);
                     }
                 },
-                function (transaction, error) {
+                function (error) {
                     executed++;
                     errors.push({
                         clientId: id,
@@ -203,7 +205,7 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
         });
     },
 
-    selectRecords: function(transaction, params, callback, scope) {
+    selectRecords: function (transaction, params, callback, scope) {
         var me = this,
             table = me.getTable(),
             idProperty = me.getModel().getIdProperty(),
@@ -223,6 +225,8 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
         if (!Ext.isObject(params)) {
             sql += filterStatement + idProperty + ' = ' + params;
         } else {
+
+            // handle filters
             ln = params.filters && params.filters.length;
             if (ln) {
                 for (i = 0; i < ln; i++) {
@@ -236,6 +240,7 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
                 }
             }
 
+            // handle sorters
             ln = params.sorters && params.sorters.length;
             if (ln) {
                 for (i = 0; i < ln; i++) {
@@ -248,14 +253,18 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
                 }
             }
 
-            // handle start, limit, sort, filter and group params
+            // TODO - Is this needed in ExtJS 5?
+            // handle paging
             if (params.page !== undefined) {
                 tmpSql = sql;
                 sql += ' LIMIT ' + parseInt(params.start, 10) + ', ' + parseInt(params.limit, 10);
             }
         }
 
-        transaction.executeSql(sql, []).then(
+        transaction.executeSql(
+            sql,
+            []
+        ).then(
             function (resultSet) {
                 var rec;
                 rows = resultSet.rows;
@@ -271,17 +280,30 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
                 }
 
                 result.setSuccess(true);
+                result.setTotal(count);
                 result.setCount(count);
+
+                if (typeof callback === 'function') {
+                    callback.call(scope || me, result);
+                }
             },
-            function (errors) {
+            function (error) {
                 result.setSuccess(false);
                 result.setTotal(0);
                 result.setCount(0);
+
+                if (typeof callback === 'function') {
+                    callback.call(scope || me, result, error);
+                }
             }
         );
 
+        // TODO - is this needed for ExtJS 5 since it can support extremely large stores?
         // Fix to have proper totals
-        transaction.executeSql(tmpSql).then(
+        transaction.executeSql(
+            tmpSql,
+            []
+        ).then(
             function (resultSet) {
                 rows = resultSet.rows;
                 count = rows.rows.length;
@@ -291,13 +313,13 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
                     callback.call(scope || me, result);
                 }
             },
-            function (errors) {
+            function (error) {
                 result.setSuccess(false);
                 result.setTotal(0);
                 result.setCount(0);
 
                 if (typeof callback === 'function') {
-                    callback.call(scope || me, result);
+                    callback.call(scope || me, result, error);
                 }
             }
         );
@@ -331,8 +353,11 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
                 updates.push(columns[i] + ' = ?');
             }
 
-            transaction.executeSql('UPDATE ' + table + ' SET ' + updates.join(', ') + ' WHERE ' + idProperty + ' = ?', values.concat(id)).then(
-                function (transaction, resultSet) {
+            transaction.executeSql(
+                'UPDATE ' + table + ' SET ' + updates.join(', ') + ' WHERE ' + idProperty + ' = ?',
+                values.concat(id)
+            ).then(
+                function (resultSet) {
                     executed++;
                     record.commit();
                     updatedRecords.push(record);
@@ -341,7 +366,7 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
                         callback.call(scope || me, result, errors.length > 0 ? errors : null);
                     }
                 },
-                function (transaction, error) {
+                function (error) {
                     executed++;
                     errors.push({
                         clientId: id,
@@ -376,8 +401,10 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
         });
 
         transaction.executeSql(
-            'DELETE FROM ' + table + ' WHERE ' + ids.join(' OR '), values).then(
-            function (transaction, resultSet) {
+            'DELETE FROM ' + table + ' WHERE ' + ids.join(' OR '),
+            values
+        ).then(
+            function (resultSet) {
                 for (i = 0, ln = records.length; i < ln; i++) {
                     record = records[i];
                     destroyedRecords.push({
@@ -389,7 +416,7 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
                     callback.call(scope || me, result);
                 }
             },
-            function (transaction, error) {
+            function (error) {
                 if (typeof callback === 'function') {
                     callback.call(scope || me, result, error);
                 }
@@ -397,7 +424,7 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
         );
     },
 
-    dropTable: function() {
+    dropTable: function () {
         var me = this,
             table = me.getTable();
 
@@ -413,7 +440,7 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
     },
 
     
-    getDatabaseObject: function() {
+    getDatabaseObject: function () {
         var me = this;
 
         // Only available in Sencha Space
@@ -429,21 +456,25 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
 
         me.db = new Ext.Promise();
 
-        Ext.onSpaceReady().then(function () {
-            return Ext.space.Sqlite.openDatabase({
-                name: 'Sencha Database',
-                version: '1.0',// we will do version tracking outside of the sqlite db version system.
-                displayName: "Sencha",
-                estimatedSize: 5 * 1024 * 1024 //we auto extend on the native side, setting the size is vestigial at this point.
-            }).then(function(db){
-                return db.transaction().then(function (tx){
-                     me.createTable(tx);
-                     return tx.run().then(function () {
-                        me.db.fulfill(db);
-                     });
-                });
-            });
-        });
+        Ext.onSpaceReady().then(
+            function () {
+                return Ext.space.Sqlite.openDatabase({
+                    name: 'Sencha Database',
+                    version: '1.0',// we will do version tracking outside of the sqlite db version system.
+                    displayName: "Sencha",
+                    estimatedSize: 5 * 1024 * 1024 //we auto extend on the native side, setting the size is vestigial at this point.
+                }).then(
+                    function (db){
+                        return db.transaction().then(function (tx){
+                             me.createTable(tx);
+                             return tx.run().then(function () {
+                                me.db.fulfill(db);
+                             });
+                        });
+                    }
+                );
+            }
+        );
         return me.db;
     }
 });

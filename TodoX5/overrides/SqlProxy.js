@@ -22,7 +22,7 @@ Ext.define('Overrides.SqlProxy', {
      * Override that uses model.getName and iterates over getFields array
      * differently so that it works in ExtJS 5
      */
-    updateModel: function(model) {
+    updateModel: function (model) {
         if (model) {
             var modelName = model.modelName || model.getName(),
                 defaultDateFormat = this.getDefaultDateFormat(),
@@ -55,12 +55,13 @@ Ext.define('Overrides.SqlProxy', {
 
         operation.setStarted();
 
-        db.transaction(function(transaction) {
+        db.transaction(
+            function (transaction) {
                 if (!tableExists) {
                     me.createTable(transaction);
                 }
 
-                me.insertRecords(records, transaction, function(resultSet, error) {
+                me.insertRecords(records, transaction, function (resultSet, error) {
                     if (error) {
                         operation.setException(error);
                     } else {
@@ -69,13 +70,13 @@ Ext.define('Overrides.SqlProxy', {
                     }
                 }, me);
             },
-            function(transaction, error) {
+            function (transaction, error) {
                 me.setException(operation, error);
                 if (typeof callback === 'function') {
                     callback.call(scope || me, operation);
                 }
             },
-            function(transaction) {
+            function (transaction) {
                 if (typeof callback === 'function') {
                     callback.call(scope || me, operation);
                 }
@@ -83,7 +84,7 @@ Ext.define('Overrides.SqlProxy', {
         );
     },
 
-    read: function(operation, callback, scope) {
+    read: function (operation, callback, scope) {
         var me = this,
             db = me.getDatabaseObject(),
             model = me.getModel(),
@@ -108,7 +109,8 @@ Ext.define('Overrides.SqlProxy', {
 
         operation.setStarted();
 
-        db.transaction(function(transaction) {
+        db.transaction(
+            function (transaction) {
                 if (!tableExists) {
                     me.createTable(transaction);
                 }
@@ -123,7 +125,7 @@ Ext.define('Overrides.SqlProxy', {
                     }
 
                     if (filters && filters.length) {
-                        filtered = Ext.create('Ext.util.Collection', function(record) {
+                        filtered = Ext.create('Ext.util.Collection', function (record) {
                             return record.getId();
                         });
                         filtered.setFilterRoot('data');
@@ -142,13 +144,13 @@ Ext.define('Overrides.SqlProxy', {
                     }
                 });
             },
-            function(transaction, error) {
+            function (transaction, error) {
                 me.setException(operation, error);
                 if (typeof callback === 'function') {
                     callback.call(scope || me, operation);
                 }
             },
-            function(transaction) {
+            function (transaction) {
                 if (typeof callback === 'function') {
                     callback.call(scope || me, operation);
                 }
@@ -156,7 +158,7 @@ Ext.define('Overrides.SqlProxy', {
         );
     },
 
-    update: function(operation, callback, scope) {
+    update: function (operation, callback, scope) {
         var me = this,
             records = operation.getRecords(),
             db = me.getDatabaseObject(),
@@ -164,7 +166,8 @@ Ext.define('Overrides.SqlProxy', {
 
         operation.setStarted();
 
-        db.transaction(function (transaction) {
+        db.transaction(
+            function (transaction) {
                 if (!tableExists) {
                     me.createTable(transaction);
                 }
@@ -179,13 +182,13 @@ Ext.define('Overrides.SqlProxy', {
 
                 });
             },
-            function(transaction, error) {
+            function (transaction, error) {
                 me.setException(operation, error);
                 if (typeof callback === 'function') {
                     callback.call(scope || me, operation);
                 }
             },
-            function(transaction) {
+            function (transaction) {
                 if (typeof callback === 'function') {
                     callback.call(scope || me, operation);
                 }
@@ -193,7 +196,7 @@ Ext.define('Overrides.SqlProxy', {
         );
     },
 
-    erase: function(operation, callback, scope) {
+    erase: function (operation, callback, scope) {
         var me = this,
             records = operation.getRecords(),
             db = me.getDatabaseObject(),
@@ -201,12 +204,13 @@ Ext.define('Overrides.SqlProxy', {
 
         operation.setStarted();
 
-        db.transaction(function(transaction) {
+        db.transaction(
+            function (transaction) {
                 if (!tableExists) {
                     me.createTable(transaction);
                 }
 
-                me.destroyRecords(transaction, records, function(resultSet, error) {
+                me.destroyRecords(transaction, records, function (resultSet, error) {
                     if (operation.process(resultSet) === false) {
                         me.fireEvent('exception', me, operation);
                     }
@@ -216,13 +220,13 @@ Ext.define('Overrides.SqlProxy', {
                     }
                 });
             },
-            function(transaction, error) {
+            function (transaction, error) {
                 me.setException(operation, error);
                 if (typeof callback === 'function') {
                     callback.call(scope || me, operation);
                 }
             },
-            function(transaction) {
+            function (transaction) {
                 if (typeof callback === 'function') {
                     callback.call(scope || me, operation);
                 }
@@ -235,7 +239,7 @@ Ext.define('Overrides.SqlProxy', {
         this.setTableExists(true);
     },
 
-    insertRecords: function(records, transaction, callback, scope) {
+    insertRecords: function (records, transaction, callback, scope) {
         var me = this,
             table = me.getTable(),
             columns = me.getColumns(),
@@ -263,7 +267,8 @@ Ext.define('Overrides.SqlProxy', {
                 values = me.getColumnValues(columns, data);
 
             transaction.executeSql(
-                'INSERT INTO ' + table + ' (' + columns.join(', ') + ') VALUES (' + placeholders + ')', values,
+                'INSERT INTO ' + table + ' (' + columns.join(', ') + ') VALUES (' + placeholders + ')',
+                values,
                 function (transaction, resultSet) {
                     executed++;
                     record.setId(uniqueIdStrategy ? id : resultSet.insertId);
@@ -289,7 +294,7 @@ Ext.define('Overrides.SqlProxy', {
         });
     },
 
-    selectRecords: function(transaction, params, callback, scope) {
+    selectRecords: function (transaction, params, callback, scope) {
         var me = this,
             table = me.getTable(),
             idProperty = me.getModel().getIdProperty(),
@@ -339,8 +344,10 @@ Ext.define('Overrides.SqlProxy', {
                 sql += ' LIMIT ' + parseInt(params.start, 10) + ', ' + parseInt(params.limit, 10);
             }
         }
-        transaction.executeSql(sql, null,
-            function(transaction, resultSet) {
+        transaction.executeSql(
+            sql, 
+            null,
+            function (transaction, resultSet) {
                 var rec;
                 rows = resultSet.rows;
                 count = rows.length;
@@ -362,7 +369,7 @@ Ext.define('Overrides.SqlProxy', {
                     callback.call(scope || me, result);
                 }
             },
-            function(transaction, error) {
+            function (transaction, error) {
 
                 result.setSuccess(false);
                 result.setTotal(0);
@@ -402,7 +409,8 @@ Ext.define('Overrides.SqlProxy', {
             }
 
             transaction.executeSql(
-                'UPDATE ' + table + ' SET ' + updates.join(', ') + ' WHERE ' + idProperty + ' = ?', values.concat(id),
+                'UPDATE ' + table + ' SET ' + updates.join(', ') + ' WHERE ' + idProperty + ' = ?',
+                values.concat(id),
                 function (transaction, resultSet) {
                     executed++;
                     record.commit();
@@ -447,7 +455,8 @@ Ext.define('Overrides.SqlProxy', {
         });
 
         transaction.executeSql(
-            'DELETE FROM ' + table + ' WHERE ' + ids.join(' OR '), values,
+            'DELETE FROM ' + table + ' WHERE ' + ids.join(' OR '), 
+            values,
             function (transaction, resultSet) {
                 for (i = 0, ln = records.length; i < ln; i++) {
                     record = records[i];
@@ -499,7 +508,7 @@ Ext.define('Overrides.SqlProxy', {
         return data;
     },
 
-    getColumnValues: function(columns, data) {
+    getColumnValues: function (columns, data) {
         var ln = columns.length,
             values = [],
             i, column, value;
@@ -515,7 +524,7 @@ Ext.define('Overrides.SqlProxy', {
         return values;
     },
 
-    getSchemaString: function() {
+    getSchemaString: function () {
         var me = this,
             schema = [],
             model = me.getModel(),
@@ -546,7 +555,7 @@ Ext.define('Overrides.SqlProxy', {
         return schema.join(', ');
     },
 
-    getPersistedModelColumns: function(model) {
+    getPersistedModelColumns: function (model) {
         var fields = model.getFields().items,
             uniqueIdStrategy = this.getUniqueIdStrategy(),
             idProperty = model.getIdProperty(),
@@ -569,7 +578,7 @@ Ext.define('Overrides.SqlProxy', {
         return columns;
     },
 
-    convertToSqlType: function(type) {
+    convertToSqlType: function (type) {
         switch (type.toLowerCase()) {
             case 'date':
             case 'string':
@@ -600,22 +609,23 @@ Ext.define('Overrides.SqlProxy', {
         }
     },
 
-    dropTable: function(config) {
+    dropTable: function (config) {
         var me = this,
             table = me.getTable(),
             callback = config ? config.callback : null,
             scope = config ? config.scope || me : null,
             db = me.getDatabaseObject();
 
-        db.transaction(function(transaction) {
+        db.transaction(
+            function (transaction) {
                 transaction.executeSql('DROP TABLE ' + table);
             },
-            function(transaction, error) {
+            function (transaction, error) {
                 if (typeof callback === 'function') {
                     callback.call(scope || me, false, table, error);
                 }
             },
-            function(transaction) {
+            function (transaction) {
                 if (typeof callback === 'function') {
                     callback.call(scope || me, true, table);
                 }
@@ -625,7 +635,7 @@ Ext.define('Overrides.SqlProxy', {
         me.setTableExists(false);
     },
 
-    getDatabaseObject: function() {
+    getDatabaseObject: function () {
         return openDatabase(this.getDatabase(), '1.0', 'Sencha Database', 5 * 1024 * 1024);
     }
 });
