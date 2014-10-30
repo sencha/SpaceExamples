@@ -13,7 +13,9 @@ Ext.define('Todo.store.Tasks', {
 
     autoLoad: true,
     autoSync: false,
-    pageSize: 0, // to turn off paging and load the entire dataset into the store
+
+    // to turn off paging and load the entire dataset into the store set this to 0
+    pageSize: 0,
 
     proxy: {
         type: 'securesql'

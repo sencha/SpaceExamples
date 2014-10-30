@@ -9,9 +9,7 @@ Ext.define('Todo.view.task.List', {
         'Todo.view.task.ListController',
         'Todo.view.task.ListModel',
         'Ext.form.Panel',
-        'Ext.view.View',
-        'Ext.grid.Panel',
-        'Ext.grid.plugin.RowEditing'
+        'Ext.grid.Panel'
     ],
 
     controller: 'tasklist',
@@ -21,16 +19,26 @@ Ext.define('Todo.view.task.List', {
 
     baseCls: 'tasklist',
 
-    layout: { 
-        type: 'vbox',  
-        align: 'stretch' 
+    layout: 'border',
+
+
+    initComponent: function () {
+        this.items = this.getItemsCfg();
+        this.callParent(arguments);
     },
 
-    items: [
-        {   
+    getItemsCfg: function () {
+        return [
+            this.getFormCfg(),
+            this.getGridCfg()
+        ];
+    },
+
+    getFormCfg: function () {
+        return {   
             xtype       : 'form',
+            region      : 'north',
             reference   : 'quickEntryForm',
-            scrollable  : null,
             items: [
                 {   
                     xtype   : 'toolbar',
@@ -58,16 +66,19 @@ Ext.define('Todo.view.task.List', {
                     ]
                 }
             ]
-        },
-        {   
+        };
+    },
+
+    getGridCfg: function () {
+        var gridStore = Ext.getStore('Tasks'),
+            pageSize = gridStore.getPageSize();
+
+        return {   
             xtype       : 'gridpanel',
-            //title       : 'Tasks',
-            rowLines    : true,
-            columnLines : true,
+            region      : 'center',
             flex        : 1,
             hideHeaders : true,
             itemId      : 'list',
-            loadingText : false,
             store       : 'Tasks',
 
             viewConfig: {
@@ -86,8 +97,17 @@ Ext.define('Todo.view.task.List', {
                         '</div>'
                     ].join('')
                 }
-            ]
+            ],
+
+            // only add pagingtoolbar if pageSize > 0
+            dockedItems: [pageSize > 0 ? {
+                xtype       : 'pagingtoolbar',
+                store       : 'Tasks',
+                dock        : 'bottom',
+                displayInfo : false
+            }: null]
             
-        }
-    ]
+        };
+    }
+
 });
