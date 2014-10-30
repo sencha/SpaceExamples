@@ -10,5 +10,4 @@ Ext.define('Todo.view.task.EditModel', {
         name: 'Todo'
     }
 
-    //TODO - add data, formulas and/or methods to support your view
 });

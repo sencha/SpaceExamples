@@ -32,8 +32,8 @@ Ext.define('Todo.view.main.Main', {
         {   xtype   : 'tasklist',
             itemId  : 'list'
         },
-        {   xtype: 'taskedit',
-            itemId: 'edit'
+        {   xtype   : 'taskedit',
+            itemId  : 'edit'
         }
     ],
 

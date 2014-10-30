@@ -32,16 +32,16 @@ Ext.define('Todo.view.task.Edit', {
 
     items   : [
         {   
-            xtype       : 'textfield',
-            name        : 'title',
-            required    : true,
-            anchor      : '100%',
-            emptyText   : 'Title'
+            xtype           : 'textfield',
+            name            : 'title',
+            required        : true,
+            anchor          : '100%',
+            emptyText       : 'Title'
         },
         {   
-            xtype       : 'textareafield',
-            name        : 'description',
-            emptyText   : 'Description'
+            xtype           : 'textareafield',
+            name            : 'description',
+            emptyText       : 'Description'
         },
         {   
             xtype           : 'checkbox',
