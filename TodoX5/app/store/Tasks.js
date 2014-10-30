@@ -10,8 +10,10 @@ Ext.define('Todo.store.Tasks', {
     ],
 
     model: 'Todo.model.Task',
+
     autoLoad: true,
     autoSync: false,
+    pageSize: 0, // to turn off paging and load the entire dataset into the store
 
     proxy: {
         type: 'securesql'
@@ -27,7 +29,7 @@ Ext.define('Todo.store.Tasks', {
         }
     ],
 
-    constructor: function(config) {
+    constructor: function (config) {
         //<debug>
         if (!Ext.isSpace) {
             // fallback if not in Space environment.
