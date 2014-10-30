@@ -210,7 +210,8 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
             table = me.getTable(),
             idProperty = me.getModel().getIdProperty(),
             sql = 'SELECT * FROM ' + table,
-            tmpSql,// temporal sql, to hold query for all records
+            countSql = 'SELECT COUNT(*) as count FROM ' + table,
+            needTotalCount = false,
             records = [],
             filterStatement = ' WHERE ',
             sortStatement = ' ORDER BY ',
@@ -253,10 +254,9 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
                 }
             }
 
-            // TODO - Is this needed in ExtJS 5?
             // handle paging
             if (params.page !== undefined) {
-                tmpSql = sql;
+                needTotalCount = true;
                 sql += ' LIMIT ' + parseInt(params.start, 10) + ', ' + parseInt(params.limit, 10);
             }
         }
@@ -283,8 +283,11 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
                 result.setTotal(count);
                 result.setCount(count);
 
-                if (typeof callback === 'function') {
-                    callback.call(scope || me, result);
+                // if paging is happening then needTotalCount is true and the callback will be handled below
+                if (!needTotalCount) {
+                    if (typeof callback === 'function') {
+                        callback.call(scope || me, result);
+                    }
                 }
             },
             function (error) {
@@ -292,37 +295,41 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
                 result.setTotal(0);
                 result.setCount(0);
 
-                if (typeof callback === 'function') {
-                    callback.call(scope || me, result, error);
+                if (!needTotalCount) {
+                    if (typeof callback === 'function') {
+                        callback.call(scope || me, result, error);
+                    }
                 }
             }
         );
 
-        // TODO - is this needed for ExtJS 5 since it can support extremely large stores?
-        // Fix to have proper totals
-        transaction.executeSql(
-            tmpSql,
-            []
-        ).then(
-            function (resultSet) {
-                rows = resultSet.rows;
-                count = rows.rows.length;
-                result.setTotal(count);
+        // Fix to have proper totals when paging is used
+        if (needTotalCount) {
+            transaction.executeSql(
+                countSql,
+                []
+            ).then(
+                function (resultSet) {
+                    rows = resultSet.rows;
+                    count = rows.item(0).count;
+                    result.setTotal(count);
 
-                if (typeof callback === 'function') {
-                    callback.call(scope || me, result);
-                }
-            },
-            function (error) {
-                result.setSuccess(false);
-                result.setTotal(0);
-                result.setCount(0);
+                    if (typeof callback === 'function') {
+                        callback.call(scope || me, result);
+                    }
+                },
+                function (error) {
+                    result.setSuccess(false);
+                    result.setTotal(0);
+                    result.setCount(0);
 
-                if (typeof callback === 'function') {
-                    callback.call(scope || me, result, error);
+                    if (typeof callback === 'function') {
+                        callback.call(scope || me, result, error);
+                    }
                 }
-            }
-        );
+            );
+        }
+
         transaction.run();
 
     },

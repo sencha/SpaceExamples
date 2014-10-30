@@ -299,6 +299,8 @@ Ext.define('Overrides.SqlProxy', {
             table = me.getTable(),
             idProperty = me.getModel().getIdProperty(),
             sql = 'SELECT * FROM ' + table,
+            countSql = 'SELECT COUNT(*) as count FROM ' + table,
+            needTotalCount = false,
             records = [],
             filterStatement = ' WHERE ',
             sortStatement = ' ORDER BY ',
@@ -314,6 +316,8 @@ Ext.define('Overrides.SqlProxy', {
         if (!Ext.isObject(params)) {
             sql += filterStatement + idProperty + ' = ' + params;
         } else {
+
+            // handle filters
             ln = params.filters && params.filters.length;
             if (ln) {
                 for (i = 0; i < ln; i++) {
@@ -327,6 +331,7 @@ Ext.define('Overrides.SqlProxy', {
                 }
             }
 
+            // handle sorters
             ln = params.sorters && params.sorters.length;
             if (ln) {
                 for (i = 0; i < ln; i++) {
@@ -339,14 +344,16 @@ Ext.define('Overrides.SqlProxy', {
                 }
             }
 
-            // handle start, limit, sort, filter and group params
+            // handle paging
             if (params.page !== undefined) {
+                needTotalCount = true;
                 sql += ' LIMIT ' + parseInt(params.start, 10) + ', ' + parseInt(params.limit, 10);
             }
         }
+
         transaction.executeSql(
             sql, 
-            null,
+            [],
             function (transaction, resultSet) {
                 var rec;
                 rows = resultSet.rows;
@@ -365,8 +372,11 @@ Ext.define('Overrides.SqlProxy', {
                 result.setTotal(count);
                 result.setCount(count);
 
-                if (typeof callback === 'function') {
-                    callback.call(scope || me, result);
+                // if paging is happening then needTotalCount is true and the callback will be handled below
+                if (!needTotalCount) {
+                    if (typeof callback === 'function') {
+                        callback.call(scope || me, result);
+                    }
                 }
             },
             function (transaction, error) {
@@ -380,6 +390,33 @@ Ext.define('Overrides.SqlProxy', {
                 }
             }
         );
+
+        // Fix to have proper totals when paging is used
+        if (needTotalCount) {
+            transaction.executeSql(
+                countSql,
+                [],
+                function (transaction, resultSet) {
+                    rows = resultSet.rows;
+                    count = rows.item(0).count;
+                    result.setTotal(count);
+
+                    if (typeof callback === 'function') {
+                        callback.call(scope || me, result);
+                    }
+                },
+                function (transaction, error) {
+                    result.setSuccess(false);
+                    result.setTotal(0);
+                    result.setCount(0);
+
+                    if (typeof callback === 'function') {
+                        callback.call(scope || me, result, error);
+                    }
+                }
+            );
+        }
+
     },
 
     updateRecords: function (transaction, records, callback, scope) {
