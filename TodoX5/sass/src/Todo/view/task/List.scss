@@ -1,0 +1,52 @@
+/**
+ * Styles for Todo.view.task.List
+ */
+
+@import "compass/css3/transition";
+
+$button-radius: .4em;
+
+
+.tasklist {
+    .x-form {
+        padding: 0.4em;
+
+        .x-btn {
+            border-color: darken($base-color, 5%);
+            border-style: solid;
+        }
+
+        .x-form-text {
+            border-radius: $button-radius 0 0 $button-radius !important;
+        }
+
+        .x-btn {
+            border-radius: 0 $button-radius $button-radius 0 !important;
+            border-width: 1px 1px 1px 0;
+        }
+
+    }
+
+    .x-grid-cell {
+        
+        @include single-transition(all, 0.5s, ease, 0);
+        @include ellipsis;
+        font-weight: bold;
+
+        .task-done {
+            color: gray;
+
+            &:before {
+                content: '\f058';
+                display: block;
+                font-family: 'FontAwesome';
+                position: absolute;
+            }
+
+            > div {
+                padding-left: 24px;
+                text-decoration: line-through;
+            }
+        }
+    }
+}
