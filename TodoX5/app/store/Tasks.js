@@ -32,13 +32,11 @@ Ext.define('Todo.store.Tasks', {
     ],
 
     constructor: function (config) {
-        //<debug>
         if (!Ext.isSpace) {
             // fallback if not in Space environment.
             console.warn('debug: this store does NOT use secure SQL');
             config.proxy = { type: 'sql' };
         }
-        //</debug>
 
         this.callParent([config]);
     }
