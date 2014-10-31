@@ -150,6 +150,10 @@
      */
     "css": [
         {
+            "path": "//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css",
+            "remote": true
+        },
+        {
             "path": "bootstrap.css",
             "bootstrap": true
         }

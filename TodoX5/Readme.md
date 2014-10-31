@@ -1,5 +1,12 @@
 # Getting Started
-This is an ExtJS 5 app and thus you will need the ExtJS 5 framework.
+This is an ExtJS 5 app and thus you will need the ExtJS 5 framework copied into this folder.
+
+
+# Notes
+
+This app includes remote resources via the "js" and "cs" configs in app.json.  Since
+this pulls in the source from a remote location, make sure to use Sencha Cmd 5.0.3.324
+or higher due to this bug: https://sencha.jira.com/browse/SDKTOOLS-919.
 
 
 

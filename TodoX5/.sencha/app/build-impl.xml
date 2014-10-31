@@ -244,6 +244,8 @@ this file in most cases.
             depends="-watch-init,development,init"
             description="Starts Watch to keep your app ready for dev mode">
         <x-ant-call>
+            <param name="build.id" value="${build.id}"/>
+            <param name="build.name" value="${build.name}"/>
             <target name="-before-watch"/>
             <target name="-watch"/>
             <target name="-after-watch"/>

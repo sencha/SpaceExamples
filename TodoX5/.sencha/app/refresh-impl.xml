@@ -22,6 +22,8 @@
         </condition>
         <property name="manifest.root.excludes" value=""/>
 
+        <property name="metadata.bootstrap.base.path" value="${build.bootstrap.metadata.dir}"/>
+
         <if>
             <x-is-true value="${app.has.js.sdk}"/>
             <then>
@@ -54,7 +56,7 @@
                     +ignoreDisabled
                     -exclude=${manifest.root.excludes}
                     -tpl={0}
-                    -basePath=${app.bootstrap.base.path}
+                    -basePath=${metadata.bootstrap.base.path}
                     -out=${build.json.bootstrap.path}
             ]]>
         </x-compile>
