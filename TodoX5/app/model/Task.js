@@ -4,6 +4,10 @@
 Ext.define('Todo.model.Task', {
     extend: 'Ext.data.Model',
 
+    requires: [
+        'Ext.data.validator.Presence'
+    ],
+
     fields: [
         {   // Task title (required)
             name: 'title',
