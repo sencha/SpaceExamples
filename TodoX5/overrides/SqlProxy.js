@@ -43,7 +43,10 @@ Ext.define('Overrides.SqlProxy', {
             this.setColumns(this.getPersistedModelColumns(model));
         }
 
-        this.callSuper(arguments);
+        // callSuper is broke for overrides in production builds (refer to SDKTOOLS-945 for more info)
+        Ext.data.proxy.Client.superclass.updateModel.apply(this, arguments);
+        //this.callSuper(arguments);
+
     },
 
 
