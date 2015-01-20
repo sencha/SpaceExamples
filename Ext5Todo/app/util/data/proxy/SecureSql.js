@@ -461,7 +461,8 @@ Ext.define('Todo.util.data.proxy.SecureSql', {
             return me.db;
         }
 
-        me.db = new Ext.Promise();
+        // Only open the database once by storing a reference to db on the prototype.
+        this.self.prototype.db = me.db = new Ext.Promise();
 
         Ext.onSpaceReady().then(
             function () {
